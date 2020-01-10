@@ -111,7 +111,7 @@ namespace web_wallpaper
             if (wallpaperHandle != IntPtr.Zero)
             {
                 DesktopTool.RemoveFromWallpaperArea(wallpaperHandle);
-                DesktopTool.UpdateWallpaper();
+                //DesktopTool.UpdateWallpaper();
 
                 wallpaperHandle = IntPtr.Zero;
             }

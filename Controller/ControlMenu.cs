@@ -15,6 +15,7 @@ namespace web_wallpaper.Controller
         private MenuItem BarItem { get; }
 
         public MenuItem WaterMarkItem { get; }
+        public MenuItem SetURLItem { get; }
         public MenuItem ExitItem { get; }
         public ControlMenu()
         {
@@ -31,6 +32,11 @@ namespace web_wallpaper.Controller
                 Enabled = false
             };
 
+            SetURLItem = new MenuItem
+            {
+                Text = "Set URL"
+            };
+
             ExitItem = new MenuItem
             {
                 Text = "Exit"
@@ -39,6 +45,7 @@ namespace web_wallpaper.Controller
             Menu.MenuItems.AddRange(new MenuItem[]{
                 WaterMarkItem,
                 BarItem,
+                SetURLItem,
                 ExitItem
             });
         }

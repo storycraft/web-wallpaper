@@ -26,6 +26,19 @@ namespace web_wallpaper.Wallpaper
             Initalized = true;
         }
 
+        public string URL
+        {
+            get
+            {
+                return Window.Browser.Address;
+            }
+
+            set
+            {
+                Window.Browser.Load(value);
+            }
+        }
+
         public void ShowWindow()
         {
             if (!Initalized)

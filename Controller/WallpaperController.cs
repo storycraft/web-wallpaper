@@ -34,6 +34,15 @@ namespace web_wallpaper.Controller
         protected void SetupMenu()
         {
             Menu.ExitItem.Click += ExitItem_Click;
+            Menu.SetURLItem.Click += SetURLItem_Click;
+        }
+
+        private void SetURLItem_Click(object sender, EventArgs e)
+        {
+            using (var form = new SetURLForm(Wallpaper.WallpaperManager))
+            {
+                form.ShowDialog();
+            }
         }
 
         private void ExitItem_Click(object sender, EventArgs e)
