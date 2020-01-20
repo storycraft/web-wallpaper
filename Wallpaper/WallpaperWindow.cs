@@ -1,4 +1,5 @@
-﻿using CefSharp.WinForms;
+﻿using CefSharp;
+using CefSharp.WinForms;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -51,6 +52,11 @@ namespace web_wallpaper.Wallpaper
         public void FillDisplay()
         {
             Form.DesktopBounds = Screen.PrimaryScreen.Bounds;
+        }
+
+        public void ShowDevTools()
+        {
+            Browser.ShowDevTools();
         }
 
         public void Dispose()

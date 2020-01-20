@@ -1,15 +1,19 @@
 ﻿using CefSharp;
 using CefSharp.WinForms;
 using StoryWallpaper;
+using StoryWallpaper.Util;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using web_wallpaper.Controller;
+using web_wallpaper.Input;
 using web_wallpaper.Threads;
+using web_wallpaper.Util;
 using web_wallpaper.Wallpaper;
 
 namespace web_wallpaper
@@ -20,8 +24,13 @@ namespace web_wallpaper
         private static CefSettings Settings { get; } = new CefSettings
         {
             PersistUserPreferences = true,
-            PersistSessionCookies = true
+            PersistSessionCookies = true,
         };
+
+        static WebWallpaper()
+        {
+            Settings.CefCommandLineArgs.Add("autoplay-policy", "no-user-gesture-required");
+        }
 
         public WallpaperController Controller { get; }
 
@@ -29,10 +38,13 @@ namespace web_wallpaper
 
         private WallpaperThread renderThread;
         private InputThread inputThread;
+
+        public IInputHandler Input { get; }
         public WebWallpaper()
         {
             Controller = new WallpaperController(this);
             WallpaperManager = new WallpaperManager(this);
+            Input = WallpaperManager;
 
             renderThread = new WallpaperThread(RenderTask);
             inputThread = new InputThread(InputTask);
@@ -70,6 +82,8 @@ namespace web_wallpaper
             renderThread.Stop();
             inputThread.Stop();
 
+            Controller.HideTrayIcon();
+
             Application.Exit();
         }
 
@@ -84,6 +98,7 @@ namespace web_wallpaper
                 Application.SetCompatibleTextRenderingDefault(false);
 
                 Cef.Initialize(Settings);
+
                 WallpaperManager.Initalize();
 
                 WallpaperManager.ShowWindow();
@@ -111,7 +126,7 @@ namespace web_wallpaper
             if (wallpaperHandle != IntPtr.Zero)
             {
                 DesktopTool.RemoveFromWallpaperArea(wallpaperHandle);
-                //DesktopTool.UpdateWallpaper();
+                DesktopTool.UpdateWallpaper();
 
                 wallpaperHandle = IntPtr.Zero;
             }
@@ -119,9 +134,62 @@ namespace web_wallpaper
             Application.Exit();
         }
 
+        private uint mouseHook = 0;
+        private uint keyboardHook = 0;
+
         protected void InputTask()
         {
+            try
+            {
+                mouseHook = Win32Util.SetWindowsHookEx(Win32Util.HookType.WH_MOUSE_LL, OnMouseInput, IntPtr.Zero, 0);
+                keyboardHook = Win32Util.SetWindowsHookEx(Win32Util.HookType.WH_KEYBOARD_LL, OnKeyboardInput, IntPtr.Zero, 0);
 
+                Application.Run();
+            }
+            catch (ThreadAbortException)
+            {
+                OnInputQuit();
+            }
+
+        }
+
+        private uint OnMouseInput(uint code, IntPtr wParam, IntPtr lParam)
+        {
+            if (code != 0)
+            {
+                return Win32Util.CallNextHookEx(mouseHook, code, wParam, lParam);
+            }
+
+            Input.OnWinMouseInput(code, wParam, lParam);
+
+            return Win32Util.CallNextHookEx(mouseHook, code, wParam, lParam);
+        }
+
+        private uint OnKeyboardInput(uint code, IntPtr wParam, IntPtr lParam)
+        {
+            if (code != 0)
+            {
+                return Win32Util.CallNextHookEx(keyboardHook, code, wParam, lParam);
+            }
+
+            Input.OnWinKeyboardInput(code, wParam, lParam);
+
+            return Win32Util.CallNextHookEx(keyboardHook, code, wParam, lParam);
+        }
+
+        protected void OnInputQuit()
+        {
+            if (mouseHook != 0)
+            {
+                Win32Util.UnhookWindowsHookEx(mouseHook);
+                mouseHook = 0;
+            }
+
+            if (keyboardHook != 0)
+            {
+                Win32Util.UnhookWindowsHookEx(keyboardHook);
+                keyboardHook = 0;
+            }
         }
 
         public void Dispose()

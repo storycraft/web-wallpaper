@@ -9,7 +9,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{E27A7F9B-A090-493A-A372-E1F3D929E38C}</ProjectGuid>
-    <OutputType>WinExe</OutputType>
+    <OutputType>Exe</OutputType>
     <RootNamespace>web_wallpaper</RootNamespace>
     <AssemblyName>web-wallpaper</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
@@ -74,6 +74,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Remoting" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -93,12 +94,14 @@
       <DependentUpon>SetURLForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Controller\WallpaperController.cs" />
+    <Compile Include="Input\InputHandler.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Threads\InputThread.cs" />
     <Compile Include="Threads\IThread.cs" />
     <Compile Include="Threads\StdThread.cs" />
     <Compile Include="Threads\WallpaperThread.cs" />
+    <Compile Include="Util\Win32Util.cs" />
     <Compile Include="Wallpaper\WallpaperManager.cs" />
     <Compile Include="Wallpaper\WallpaperWindow.cs" />
     <Compile Include="WebWallpaper.cs" />
@@ -129,7 +132,6 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

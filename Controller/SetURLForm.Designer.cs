@@ -34,9 +34,10 @@
             // 
             // selectBtn
             // 
-            this.selectBtn.Location = new System.Drawing.Point(613, 108);
+            this.selectBtn.Location = new System.Drawing.Point(238, 37);
+            this.selectBtn.Margin = new System.Windows.Forms.Padding(1, 1, 1, 1);
             this.selectBtn.Name = "selectBtn";
-            this.selectBtn.Size = new System.Drawing.Size(218, 68);
+            this.selectBtn.Size = new System.Drawing.Size(85, 19);
             this.selectBtn.TabIndex = 0;
             this.selectBtn.Text = "확인";
             this.selectBtn.UseVisualStyleBackColor = true;
@@ -44,19 +45,21 @@
             // 
             // urlBox
             // 
-            this.urlBox.Location = new System.Drawing.Point(12, 33);
+            this.urlBox.Location = new System.Drawing.Point(5, 9);
+            this.urlBox.Margin = new System.Windows.Forms.Padding(1, 1, 1, 1);
             this.urlBox.Name = "urlBox";
-            this.urlBox.Size = new System.Drawing.Size(819, 52);
+            this.urlBox.Size = new System.Drawing.Size(321, 21);
             this.urlBox.TabIndex = 1;
             // 
             // SetURLForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(18F, 44F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(855, 195);
+            this.ClientSize = new System.Drawing.Size(333, 66);
             this.Controls.Add(this.urlBox);
             this.Controls.Add(this.selectBtn);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.Margin = new System.Windows.Forms.Padding(1, 1, 1, 1);
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "SetURLForm";

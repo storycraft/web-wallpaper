@@ -16,6 +16,11 @@ namespace web_wallpaper.Controller
 
         public MenuItem WaterMarkItem { get; }
         public MenuItem SetURLItem { get; }
+
+        public MenuItem MouseMovementItem { get; }
+        public MenuItem MouseInteractionItem { get; }
+
+        public MenuItem DevToolsItem { get; }
         public MenuItem ExitItem { get; }
         public ControlMenu()
         {
@@ -37,6 +42,21 @@ namespace web_wallpaper.Controller
                 Text = "Set URL"
             };
 
+            MouseMovementItem = new MenuItem
+            {
+                Text = "Enable Mouse Movement"
+            };
+
+            MouseInteractionItem = new MenuItem
+            {
+                Text = "Enable Mouse Interaction"
+            };
+
+            DevToolsItem = new MenuItem
+            {
+                Text = "Show DevTools"
+            };
+
             ExitItem = new MenuItem
             {
                 Text = "Exit"
@@ -46,6 +66,9 @@ namespace web_wallpaper.Controller
                 WaterMarkItem,
                 BarItem,
                 SetURLItem,
+                MouseMovementItem,
+                MouseInteractionItem,
+                DevToolsItem,
                 ExitItem
             });
         }

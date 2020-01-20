@@ -27,6 +27,7 @@ namespace web_wallpaper.Controller
 
             Icon.Icon = SystemIcons.Application;
             Menu.Hook(Icon);
+            Icon.ContextMenu.Popup += OnMenuOpen;
 
             SetupMenu();
         }
@@ -35,9 +36,34 @@ namespace web_wallpaper.Controller
         {
             Menu.ExitItem.Click += ExitItem_Click;
             Menu.SetURLItem.Click += SetURLItem_Click;
+            Menu.DevToolsItem.Click += DevToolsItem_Click;
+
+            Menu.MouseMovementItem.Click += MouseMovementItem_Click;
+            Menu.MouseInteractionItem.Click += MouseInteractionItem_Click;
         }
 
-        private void SetURLItem_Click(object sender, EventArgs e)
+        protected void OnMenuOpen(object sender, EventArgs e)
+        {
+            Menu.MouseMovementItem.Checked = Wallpaper.WallpaperManager.MouseMovementEnabled;
+            Menu.MouseInteractionItem.Checked = Wallpaper.WallpaperManager.MouseInteractionEnabled;
+        }
+
+        protected void MouseMovementItem_Click(object sender, EventArgs e)
+        {
+            Menu.MouseMovementItem.Checked = Wallpaper.WallpaperManager.MouseMovementEnabled = !Menu.MouseMovementItem.Checked;
+        }
+
+        protected void MouseInteractionItem_Click(object sender, EventArgs e)
+        {
+            Menu.MouseInteractionItem.Checked = Wallpaper.WallpaperManager.MouseInteractionEnabled = !Menu.MouseInteractionItem.Checked;
+        }
+
+        protected void DevToolsItem_Click(object sender, EventArgs e)
+        {
+            Wallpaper.WallpaperManager.Window.ShowDevTools();
+        }
+
+        protected void SetURLItem_Click(object sender, EventArgs e)
         {
             using (var form = new SetURLForm(Wallpaper.WallpaperManager))
             {
@@ -45,7 +71,7 @@ namespace web_wallpaper.Controller
             }
         }
 
-        private void ExitItem_Click(object sender, EventArgs e)
+        protected void ExitItem_Click(object sender, EventArgs e)
         {
             Wallpaper.Stop();
         }
