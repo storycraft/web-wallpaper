@@ -19,7 +19,7 @@ namespace web_wallpaper.Wallpaper
         {
             Form = new Form();
 
-            Browser = new ChromiumWebBrowser("https://webglsamples.org/electricflower/electricflower.html", null);
+            Browser = new ChromiumWebBrowser("https://www.google.com", null);
 
             InitalizeWindow();
         }

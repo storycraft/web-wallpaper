@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using web_wallpaper.Controller;
 using web_wallpaper.Input;
+using web_wallpaper.Log;
 using web_wallpaper.Threads;
 using web_wallpaper.Util;
 using web_wallpaper.Wallpaper;
@@ -68,6 +69,8 @@ namespace web_wallpaper
 
             Controller.ShowTrayIcon();
 
+            Logger.Log("Webwallpaper started");
+
             Application.Run();
         }
 
@@ -77,14 +80,17 @@ namespace web_wallpaper
             {
                 throw new Exception("WebWallpaper is not started");
             }
-            Started = false;
-
+            Logger.Log("Stopping...");
+            
             renderThread.Stop();
             inputThread.Stop();
+            renderThread.Wait();
 
             Controller.HideTrayIcon();
 
             Application.Exit();
+
+            Started = false;
         }
 
         private IntPtr wallpaperHandle = IntPtr.Zero;
@@ -107,12 +113,13 @@ namespace web_wallpaper
 
                 WallpaperManager.Window.FillDisplay();
 
-                Application.Run();
+                Logger.Log("Render task started");
 
-                OnRenderQuit();
+                Application.Run();
             } catch (ThreadAbortException)
             {
                 OnRenderQuit();
+                Logger.Log("Render task finished");
             }
         }
 
@@ -122,6 +129,8 @@ namespace web_wallpaper
             {
                 Cef.Shutdown();
             }
+
+            WallpaperManager.HideWindow();
 
             if (wallpaperHandle != IntPtr.Zero)
             {
@@ -144,11 +153,15 @@ namespace web_wallpaper
                 mouseHook = Win32Util.SetWindowsHookEx(Win32Util.HookType.WH_MOUSE_LL, OnMouseInput, IntPtr.Zero, 0);
                 keyboardHook = Win32Util.SetWindowsHookEx(Win32Util.HookType.WH_KEYBOARD_LL, OnKeyboardInput, IntPtr.Zero, 0);
 
+                Logger.Log("Input task started");
+
                 Application.Run();
             }
             catch (ThreadAbortException)
             {
                 OnInputQuit();
+
+                Logger.Log("Input task finished");
             }
 
         }

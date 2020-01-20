@@ -40,12 +40,32 @@ namespace web_wallpaper.Controller
 
             Menu.MouseMovementItem.Click += MouseMovementItem_Click;
             Menu.MouseInteractionItem.Click += MouseInteractionItem_Click;
+
+            Menu.KeyboardItem.Click += KeyboardItem_Click;
+
+            Menu.PopupItem.Click += PopupItem_Click;
+            Menu.ToggleRendering.Click += ToggleRendering_Click;
         }
 
         protected void OnMenuOpen(object sender, EventArgs e)
         {
             Menu.MouseMovementItem.Checked = Wallpaper.WallpaperManager.MouseMovementEnabled;
             Menu.MouseInteractionItem.Checked = Wallpaper.WallpaperManager.MouseInteractionEnabled;
+
+            Menu.KeyboardItem.Checked = Wallpaper.WallpaperManager.KeyboardEnabled;
+
+            Menu.PopupItem.Checked = Wallpaper.WallpaperManager.PopupRedirect;
+
+            Menu.ToggleRendering.Checked = Wallpaper.WallpaperManager.RenderingEnabled;
+        }
+        protected void ToggleRendering_Click(object sender, EventArgs e)
+        {
+            Menu.ToggleRendering.Checked = Wallpaper.WallpaperManager.RenderingEnabled = !Menu.ToggleRendering.Checked;
+        }
+
+        protected void PopupItem_Click(object sender, EventArgs e)
+        {
+            Menu.PopupItem.Checked = Wallpaper.WallpaperManager.PopupRedirect = !Menu.PopupItem.Checked;
         }
 
         protected void MouseMovementItem_Click(object sender, EventArgs e)
@@ -56,6 +76,11 @@ namespace web_wallpaper.Controller
         protected void MouseInteractionItem_Click(object sender, EventArgs e)
         {
             Menu.MouseInteractionItem.Checked = Wallpaper.WallpaperManager.MouseInteractionEnabled = !Menu.MouseInteractionItem.Checked;
+        }
+
+        private void KeyboardItem_Click(object sender, EventArgs e)
+        {
+            Menu.KeyboardItem.Checked = Wallpaper.WallpaperManager.KeyboardEnabled = !Menu.KeyboardItem.Checked;
         }
 
         protected void DevToolsItem_Click(object sender, EventArgs e)

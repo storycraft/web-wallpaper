@@ -1,4 +1,6 @@
-﻿using CefSharp.WinForms;
+﻿using CefSharp;
+using CefSharp.WinForms;
+using StoryWallpaper;
 using StoryWallpaper.Util;
 using System;
 using System.Collections.Generic;
@@ -12,7 +14,7 @@ using web_wallpaper.Util;
 
 namespace web_wallpaper.Wallpaper
 {
-    public class WallpaperManager : IDisposable, IInputHandler
+    public class WallpaperManager : IDisposable, IInputHandler, ILifeSpanHandler
     {
 
         public WebWallpaper Wallpaper { get; }
@@ -24,12 +26,49 @@ namespace web_wallpaper.Wallpaper
 
         public bool MouseMovementEnabled { get; set; }
         public bool MouseInteractionEnabled { get; set; }
+
+        public bool KeyboardEnabled { get; set; }
+
+        public bool PopupRedirect { get; set; }
+
+        public bool RenderingEnabled
+        {
+            get
+            {
+                if (Window?.Browser != null)
+                    return Window.Browser.Visible;
+
+                return false;
+            }
+
+            set
+            {
+                if (Window.Form.InvokeRequired)
+                {
+                    Window.Form.Invoke(new Action(() => Window.Form.Visible = value));
+                }
+                else
+                {
+                    Window.Form.Visible = value;
+                }
+                
+                Window.Browser.GetBrowserHost()?.WasHidden(value);
+
+                if (!value)
+                {
+                    DesktopTool.UpdateWallpaper();
+                }
+            }
+        }
+
         public WallpaperManager(WebWallpaper wallpaper)
         {
             Wallpaper = wallpaper;
 
             MouseMovementEnabled = true;
             MouseInteractionEnabled = false;
+            KeyboardEnabled = false;
+            PopupRedirect = true;
         }
 
         public void Initalize()
@@ -37,6 +76,8 @@ namespace web_wallpaper.Wallpaper
             Window = new WallpaperWindow();
             WindowHandle = Window.Form.Handle;
             Initalized = true;
+
+            Window.Browser.LifeSpanHandler = this;
         }
 
         public string URL
@@ -146,9 +187,79 @@ namespace web_wallpaper.Wallpaper
 
         public void OnWinKeyboardInput(uint code, IntPtr wParam, IntPtr lParam)
         {
-            if (!Initalized)
+            if (!Initalized || !KeyboardEnabled)
                 return;
 
+            int keyCode = Marshal.ReadInt32(lParam);
+            uint type = (uint) wParam.ToInt32();
+
+            Window.Browser.Invoke(new Action(() => {
+                IntPtr handle = Win32Util.GetForegroundWindow();
+
+                if (!HandleUtil.DesktopAreaHandle.Equals(handle))
+                    return;
+
+                CefSharp.IBrowserHost host = Window.Browser.GetBrowser().GetHost();
+
+                switch (type)
+                {
+                    case Win32Util.WM_KEYDOWN:
+                        host.SendKeyEvent(new KeyEvent()
+                        {
+                            WindowsKeyCode = keyCode,
+                            FocusOnEditableField = true,
+                            Type = KeyEventType.KeyDown,
+                            IsSystemKey = false
+                        });
+                        break;
+
+                    case Win32Util.WM_KEYUP:
+                        host.SendKeyEvent(new KeyEvent()
+                        {
+                            WindowsKeyCode = keyCode,
+                            FocusOnEditableField = true,
+                            Type = KeyEventType.KeyUp,
+                            IsSystemKey = false
+                        });
+                        break;
+
+                    default: break;
+                }
+            }));
+        }
+
+        public bool OnBeforePopup(IWebBrowser chromiumWebBrowser, IBrowser browser, IFrame frame, string targetUrl, string targetFrameName, WindowOpenDisposition targetDisposition, bool userGesture, IPopupFeatures popupFeatures, IWindowInfo windowInfo, IBrowserSettings browserSettings, ref bool noJavascriptAccess, out IWebBrowser newBrowser)
+        {
+            if (PopupRedirect)
+            {
+                Window.Browser.Load(targetUrl);
+
+                newBrowser = null;
+
+                return true;
+            }
+
+            ChromiumWebBrowser newB = new ChromiumWebBrowser();
+
+            newB.SetAsPopup();
+
+            newBrowser = newB;
+
+            return false;
+        }
+
+        public void OnAfterCreated(IWebBrowser chromiumWebBrowser, IBrowser browser)
+        {
+
+        }
+
+        public bool DoClose(IWebBrowser chromiumWebBrowser, IBrowser browser)
+        {
+            return true;
+        }
+
+        public void OnBeforeClose(IWebBrowser chromiumWebBrowser, IBrowser browser)
+        {
 
         }
     }

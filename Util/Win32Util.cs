@@ -75,6 +75,9 @@ namespace web_wallpaper.Util
         public const uint WM_MOUSEWHEEL = 0x20A;
         public const uint WM_MOUSEHWHEEL = 0x20E;
 
+        public const uint WM_KEYUP = 0x0101;
+        public const uint WM_KEYDOWN = 0x0100;
+
         [StructLayout(LayoutKind.Sequential)]
         public class KBDLLHOOKSTRUCT
         {

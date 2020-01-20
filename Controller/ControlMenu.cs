@@ -20,6 +20,12 @@ namespace web_wallpaper.Controller
         public MenuItem MouseMovementItem { get; }
         public MenuItem MouseInteractionItem { get; }
 
+        public MenuItem KeyboardItem { get; }
+
+        public MenuItem PopupItem { get; }
+
+        public MenuItem ToggleRendering { get; }
+
         public MenuItem DevToolsItem { get; }
         public MenuItem ExitItem { get; }
         public ControlMenu()
@@ -52,6 +58,21 @@ namespace web_wallpaper.Controller
                 Text = "Enable Mouse Interaction"
             };
 
+            KeyboardItem = new MenuItem
+            {
+                Text = "Enable Keyboard"
+            };
+
+            PopupItem = new MenuItem
+            {
+                Text = "Redirect new window to wallpaper"
+            };
+
+            ToggleRendering = new MenuItem
+            {
+                Text = "Toggle Rendering"
+            };
+
             DevToolsItem = new MenuItem
             {
                 Text = "Show DevTools"
@@ -68,6 +89,9 @@ namespace web_wallpaper.Controller
                 SetURLItem,
                 MouseMovementItem,
                 MouseInteractionItem,
+                KeyboardItem,
+                PopupItem,
+                ToggleRendering,
                 DevToolsItem,
                 ExitItem
             });

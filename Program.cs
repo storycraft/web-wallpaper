@@ -13,7 +13,10 @@ namespace web_wallpaper
         [STAThread]
         static void Main()
         {
-            using(var program = new WebWallpaper())
+            Console.WriteLine("Webwallpaper by storycraft");
+            Console.WriteLine("==========================");
+
+            using (var program = new WebWallpaper())
             {
                 program.Start();
             }
