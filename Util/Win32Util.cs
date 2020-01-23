@@ -49,16 +49,10 @@ namespace web_wallpaper.Util
         public struct MOUSEHOOKSTRUCT
         {
             public Point pt;
-            public IntPtr hwnd;
-            public uint wHitTestCode;
+            public int mouseData;
+            public int flags;
+            public int time;
             public IntPtr dwExtraInfo;
-        }
-
-        [StructLayout(LayoutKind.Sequential)]
-        public struct MouseHookStructEx
-        {
-            public MOUSEHOOKSTRUCT mouseHookStruct;
-            public int MouseData;
         }
 
         public const int HC_ACTION = 0;

@@ -31,6 +31,8 @@ namespace web_wallpaper.Wallpaper
 
         public bool PopupRedirect { get; set; }
 
+        public bool HandlerEnabled { get; set; }
+
         public bool RenderingEnabled
         {
             get
@@ -69,6 +71,7 @@ namespace web_wallpaper.Wallpaper
             MouseInteractionEnabled = false;
             KeyboardEnabled = false;
             PopupRedirect = true;
+            HandlerEnabled = false;
         }
 
         public void Initalize()
@@ -78,6 +81,16 @@ namespace web_wallpaper.Wallpaper
             Initalized = true;
 
             Window.Browser.LifeSpanHandler = this;
+            Window.Browser.FocusHandler = null;
+
+            Window.Browser.IsBrowserInitializedChanged += Browser_IsBrowserInitializedChanged;
+        }
+
+        protected void Browser_IsBrowserInitializedChanged(object sender, EventArgs e)
+        {
+            var host = Window.Browser.GetBrowserHost();
+
+            host.SetZoomLevel(0.0);
         }
 
         public string URL
@@ -120,8 +133,7 @@ namespace web_wallpaper.Wallpaper
             if (!Initalized || !(MouseInteractionEnabled || MouseMovementEnabled))
                 return;
 
-            Win32Util.MouseHookStructEx inputEx = Marshal.PtrToStructure<Win32Util.MouseHookStructEx>(lParam);
-            Win32Util.MOUSEHOOKSTRUCT input = inputEx.mouseHookStruct;
+            Win32Util.MOUSEHOOKSTRUCT input = Marshal.PtrToStructure<Win32Util.MOUSEHOOKSTRUCT>(lParam);
             uint type = (uint) wParam.ToInt32();
 
             Window.Browser.Invoke(new Action(() => {
@@ -149,6 +161,7 @@ namespace web_wallpaper.Wallpaper
                     switch (type)
                     {
                         case Win32Util.WM_LBUTTONDOWN:
+                            host.SendFocusEvent(true);
                             host.SendMouseClickEvent(new CefSharp.MouseEvent(input.pt.X, input.pt.Y, CefSharp.CefEventFlags.None), CefSharp.MouseButtonType.Left, false, 1);
                             break;
 
@@ -157,6 +170,7 @@ namespace web_wallpaper.Wallpaper
                             break;
 
                         case Win32Util.WM_MBUTTONDOWN:
+                            host.SendFocusEvent(true);
                             host.SendMouseClickEvent(new CefSharp.MouseEvent(input.pt.X, input.pt.Y, CefSharp.CefEventFlags.None), CefSharp.MouseButtonType.Middle, false, 1);
                             break;
 
@@ -165,6 +179,7 @@ namespace web_wallpaper.Wallpaper
                             break;
 
                         case Win32Util.WM_RBUTTONDOWN:
+                            host.SendFocusEvent(true);
                             host.SendMouseClickEvent(new CefSharp.MouseEvent(input.pt.X, input.pt.Y, CefSharp.CefEventFlags.None), CefSharp.MouseButtonType.Right, false, 1);
                             break;
 
@@ -173,7 +188,7 @@ namespace web_wallpaper.Wallpaper
                             break;
 
                         case Win32Util.WM_MOUSEWHEEL:
-                            int deltaY = (int)((inputEx.MouseData & 0xffff0000) >> 4);
+                            int deltaY = input.mouseData >> 16;
                             host.SendMouseWheelEvent(new CefSharp.MouseEvent(input.pt.X, input.pt.Y, CefSharp.CefEventFlags.None), 0, deltaY);
                             break;
 
@@ -255,7 +270,7 @@ namespace web_wallpaper.Wallpaper
 
         public bool DoClose(IWebBrowser chromiumWebBrowser, IBrowser browser)
         {
-            return true;
+            return false;
         }
 
         public void OnBeforeClose(IWebBrowser chromiumWebBrowser, IBrowser browser)

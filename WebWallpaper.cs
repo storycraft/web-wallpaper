@@ -155,6 +155,8 @@ namespace web_wallpaper
 
                 Logger.Log("Input task started");
 
+                Input.HandlerEnabled = true;
+
                 Application.Run();
             }
             catch (ThreadAbortException)
@@ -173,7 +175,8 @@ namespace web_wallpaper
                 return Win32Util.CallNextHookEx(mouseHook, code, wParam, lParam);
             }
 
-            Input.OnWinMouseInput(code, wParam, lParam);
+            if (Input.HandlerEnabled)
+                Input.OnWinMouseInput(code, wParam, lParam);
 
             return Win32Util.CallNextHookEx(mouseHook, code, wParam, lParam);
         }
@@ -185,13 +188,16 @@ namespace web_wallpaper
                 return Win32Util.CallNextHookEx(keyboardHook, code, wParam, lParam);
             }
 
-            Input.OnWinKeyboardInput(code, wParam, lParam);
+            if (Input.HandlerEnabled)
+                Input.OnWinKeyboardInput(code, wParam, lParam);
 
             return Win32Util.CallNextHookEx(keyboardHook, code, wParam, lParam);
         }
 
         protected void OnInputQuit()
         {
+            Input.HandlerEnabled = false;
+
             if (mouseHook != 0)
             {
                 Win32Util.UnhookWindowsHookEx(mouseHook);
