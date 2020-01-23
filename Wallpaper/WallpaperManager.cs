@@ -125,7 +125,6 @@ namespace web_wallpaper.Wallpaper
         public void Dispose()
         {
             Window?.Dispose();
-            Initalized = false;
         }
 
         public void OnWinMouseInput(uint code, IntPtr wParam, IntPtr lParam)
@@ -135,6 +134,11 @@ namespace web_wallpaper.Wallpaper
 
             Win32Util.MOUSEHOOKSTRUCT input = Marshal.PtrToStructure<Win32Util.MOUSEHOOKSTRUCT>(lParam);
             uint type = (uint) wParam.ToInt32();
+
+            if (Window.Browser.IsDisposed)
+            {
+                return;
+            }
 
             Window.Browser.Invoke(new Action(() => {
                 IntPtr handle = Win32Util.GetForegroundWindow();
@@ -207,6 +211,11 @@ namespace web_wallpaper.Wallpaper
 
             int keyCode = Marshal.ReadInt32(lParam);
             uint type = (uint) wParam.ToInt32();
+
+            if (Window.Browser.IsDisposed)
+            {
+                return;
+            }
 
             Window.Browser.Invoke(new Action(() => {
                 IntPtr handle = Win32Util.GetForegroundWindow();

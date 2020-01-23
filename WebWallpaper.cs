@@ -81,10 +81,12 @@ namespace web_wallpaper
                 throw new Exception("WebWallpaper is not started");
             }
             Logger.Log("Stopping...");
-            
+
             renderThread.Stop();
-            inputThread.Stop();
             renderThread.Wait();
+
+            inputThread.Stop();
+            inputThread.Wait();
 
             Controller.HideTrayIcon();
 
@@ -118,6 +120,7 @@ namespace web_wallpaper
                 Application.Run();
             } catch (ThreadAbortException)
             {
+                Thread.ResetAbort();
                 OnRenderQuit();
                 Logger.Log("Render task finished");
             }
@@ -148,6 +151,7 @@ namespace web_wallpaper
 
         protected void InputTask()
         {
+            Input.HandlerEnabled = false;
             try
             {
                 mouseHook = Win32Util.SetWindowsHookEx(Win32Util.HookType.WH_MOUSE_LL, OnMouseInput, IntPtr.Zero, 0);
@@ -161,6 +165,7 @@ namespace web_wallpaper
             }
             catch (ThreadAbortException)
             {
+                Thread.ResetAbort();
                 OnInputQuit();
 
                 Logger.Log("Input task finished");
@@ -170,34 +175,54 @@ namespace web_wallpaper
 
         private uint OnMouseInput(uint code, IntPtr wParam, IntPtr lParam)
         {
-            if (code != 0)
+            try
             {
+                if (code != 0)
+                {
+                    return Win32Util.CallNextHookEx(mouseHook, code, wParam, lParam);
+                }
+
+                if (Input.HandlerEnabled)
+                    Input.OnWinMouseInput(code, wParam, lParam);
+
                 return Win32Util.CallNextHookEx(mouseHook, code, wParam, lParam);
+            } catch (ThreadAbortException)
+            {
+                Thread.ResetAbort();
+                return 0;
             }
-
-            if (Input.HandlerEnabled)
-                Input.OnWinMouseInput(code, wParam, lParam);
-
-            return Win32Util.CallNextHookEx(mouseHook, code, wParam, lParam);
         }
 
         private uint OnKeyboardInput(uint code, IntPtr wParam, IntPtr lParam)
         {
-            if (code != 0)
+            try
             {
+                if (code != 0)
+                {
+                    return Win32Util.CallNextHookEx(keyboardHook, code, wParam, lParam);
+                }
+
+                if (Input.HandlerEnabled)
+                    Input.OnWinKeyboardInput(code, wParam, lParam);
+
                 return Win32Util.CallNextHookEx(keyboardHook, code, wParam, lParam);
+            } catch (ThreadAbortException)
+            {
+                Thread.ResetAbort();
+                return 0;
             }
-
-            if (Input.HandlerEnabled)
-                Input.OnWinKeyboardInput(code, wParam, lParam);
-
-            return Win32Util.CallNextHookEx(keyboardHook, code, wParam, lParam);
         }
 
         protected void OnInputQuit()
         {
-            Input.HandlerEnabled = false;
+            UnHookInput();
 
+
+            Application.Exit();
+        }
+
+        protected void UnHookInput()
+        {
             if (mouseHook != 0)
             {
                 Win32Util.UnhookWindowsHookEx(mouseHook);
